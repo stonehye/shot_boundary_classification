@@ -14,9 +14,8 @@ import cv2
 
 from utils.accuracy import *
 
-model_path = '/hdd/stonehye/shot_data/models/20200624134226/00260.pth'
+model_path = '/hdd/stonehye/shot_data/models/20200625055718/00210.pth'
 testset_path = '/hdd/stonehye/shot_data/test/'
-
 
 transforms = transforms.Compose([
     transforms.Resize(256),
@@ -39,6 +38,11 @@ top1.reset()
 
 total = 0
 correct = 0
+TP = 0
+FP = 0
+FN = 0
+TN = 0
+# save_num = 0
 for batch_idx, (data, target) in enumerate(testloader):
     # print("{} test".format(batch_idx))
     if torch.cuda.is_available():
@@ -50,7 +54,33 @@ for batch_idx, (data, target) in enumerate(testloader):
     _, predicted = torch.max(output.data, 1)
     total += target.size(0)
     correct += (predicted == target).sum().item()
-    
+
+    # 오답 이미지 저장 #
+    # for idx, image in enumerate(data):
+    #     if (predicted[idx]!=target[idx]):
+    #         if predicted[idx].item() == 0:
+    #             torchvision.utils.save_image(image,'./wrong/positive/'+str(save_num)+".jpg")
+    #         else:
+    #             torchvision.utils.save_image(image,'./wrong/negative/'+str(save_num)+".jpg")
+    #         save_num+=1
+
+    for idx, image in enumerate(data):
+        if (predicted[idx]!=target[idx]): # wrong output
+            if predicted[idx].item() == 0:
+                FN += 1
+            else:
+                FP += 1
+        else: # correct output
+            if predicted[idx].item() == 0:
+                TN += 1
+            else:
+                TP += 1
+
 
 print("Top1 Accuraccy\t{}".format(top1.avg))
-print('Accuracy: %d %%' % (100 * correct / total))
+# print('Accuracy: %d %%' % (100 * correct / total))
+Pre = TP/(TP+FP)
+Rec = TP/(TP+FN)
+print("Precision\t{}".format(Pre))
+print("Recall\t{}".format(Rec))
+print("F1 Score\t{}".format(2*(Pre*Rec/(Pre+Rec))))
