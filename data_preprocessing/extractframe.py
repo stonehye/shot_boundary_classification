@@ -4,9 +4,9 @@ import numpy as np
 import sys
 from random import *
 
-result_dir = '/hdd/stonehye/shot_data/temp_positive/'
+result_dir = '/hdd/stonehye/shot_data/temp_negative/'
 # result_dir = './'
-negative_max = 200
+negative_max = 750
 
 
 def Frame(videopath, frame_list):
@@ -45,7 +45,7 @@ def positive():
 
 
 def negative():
-	video_list = glob.glob('/hdd/stonehye/shot_data/video_data/trecvid2018/*')
+	video_list = glob.glob('/hdd/stonehye/shot_data/video_data/vcdb_core/*')
 	video_list = [file for file in video_list if (file.endswith('.flv') or file.endswith('.mp4'))]
 	negative_cnt = 1
 
@@ -81,5 +81,5 @@ def negative():
 
 
 if __name__ == '__main__':
-	positive()
+	negative()
 			

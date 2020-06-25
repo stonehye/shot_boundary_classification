@@ -10,7 +10,7 @@ def concatenate(frame1, frame2, output_name = './result.jpg'):
     height, width = frame1.shape[:2]
     frame1_cropped = frame1[0:height, 0:int(width/2)]
     height, width = frame2.shape[:2]
-    frame2_cropped = frame2[0:height, int(width/2):width]
+    frame2_cropped = frame2[0:height, 0:int(width/2)]
     result = cv2.hconcat((frame1_cropped, frame2_cropped))
     cv2.imwrite(output_name, result)
 
@@ -18,7 +18,7 @@ def concatenate(frame1, frame2, output_name = './result.jpg'):
 if __name__ == '__main__':
     directory = '/hdd/stonehye/shot_data/temp_negative/*'
     # directory = '/hdd/stonehye/shot_data/*'
-    result_directory = '/hdd/stonehye/shot_data/negative/'
+    result_directory = '/hdd/stonehye/shot_data/test_again/negative/'
     frame_list = glob.glob(directory)
     frame_list = [file for file in frame_list if (file.endswith('.jpg'))]
     frame_list = sorted(frame_list)
