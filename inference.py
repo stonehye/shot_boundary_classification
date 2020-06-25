@@ -17,6 +17,7 @@ m.classifier[1] = nn.Linear(m.last_channel, 2)
 m = m.cuda()
 m = nn.DataParallel(m)
 m.load_state_dict(torch.load(model_path))
+m.eval()
 
 
 def inference(image):
