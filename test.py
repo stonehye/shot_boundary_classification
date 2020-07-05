@@ -14,12 +14,12 @@ import cv2
 
 from utils.accuracy import *
 
-model_path = '/hdd/stonehye/shot_data/models/20200625055718/00210.pth'
+model_path = '/hdd/stonehye/shot_data/models/20200630013953/00045.pth'
 testset_path = '/hdd/stonehye/shot_data/test/'
 
 transforms = transforms.Compose([
-    transforms.Resize(256),
-    transforms.CenterCrop(256),
+    transforms.Resize((256,400)),
+    # transforms.CenterCrop(256),
     transforms.ToTensor()
 ])
 test_dataset = datasets.ImageFolder(testset_path, transform=transforms)

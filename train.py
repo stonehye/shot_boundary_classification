@@ -21,18 +21,18 @@ mt = 0.9
 wd = 0.00004
 step = 30
 g = 0.98
-epoch_num = 300
+epoch_num = 200
 
 
 data_transforms = {
     'train': transforms.Compose([
-        transforms.RandomResizedCrop(256),
+        transforms.Resize((256,400)),
         transforms.ToTensor()
         # transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ]),
     'val': transforms.Compose([
-        transforms.Resize(256),
-        transforms.CenterCrop(256),
+        transforms.Resize((256,400)),
+        # transforms.CenterCrop(256),
         transforms.ToTensor()
         # transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ]),
@@ -92,7 +92,7 @@ log.line()
 log(model_ft) # 2. network layer info
 log.line()
 
-model_save_point = 5
+model_save_point = 3
 
 # train #
 for epoch in range(epoch_num):

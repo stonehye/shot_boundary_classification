@@ -8,9 +8,11 @@ import sys
 import time
 import argparse
 from torchvision import datasets, models, transforms
+from torchvision.utils import save_image
 from PIL import Image
 
-model_path = 'model/00210.pth'
+# model_path = 'model/00210.pth'
+model_path = '/hdd/stonehye/shot_data/models/20200630013953/00045.pth'
 
 m = models.mobilenet_v2(pretrained=False)
 m.classifier[1] = nn.Linear(m.last_channel, 2)
@@ -23,19 +25,14 @@ m.eval()
 def inference(image):
     # image = Image.open(image_path)
     data_transforms = transforms.Compose([
-        transforms.Resize(256),
-        transforms.CenterCrop(256),
+        transforms.Resize((256,400)),
         transforms.ToTensor()
     ])
     x = data_transforms(image)
+    img1 = x[0]
+    save_image(img1, "test.jpg")
     x.unsqueeze_(0)
     x.cuda()
-
-    # m = models.mobilenet_v2(pretrained=False)
-    # m.classifier[1] = nn.Linear(m.last_channel, 2)
-    # m = m.cuda()
-    # m = nn.DataParallel(m)
-    # m.load_state_dict(torch.load(model_path))
 
     output = m(x)
     _, predicted = torch.max(output.data, 1)
@@ -93,8 +90,11 @@ if __name__ == "__main__":
 
     elif args.option == "video" or args.option == "Video":
         print("test video path: {}".format(args.videopath))
+        videoname = args.videopath.split('/')[-1]
         frame_list = frame_extract(args.videopath)
         shot_boundary_list = list()
+        directory_path = 'SB/'+ videoname + '/'
+        os.makedirs(directory_path)
         for idx, frame in enumerate(frame_list[1:]):
             print("%.2f%%" %(100*(idx/len(frame_list[1:])))) # print percent
             idx += 1
@@ -103,12 +103,15 @@ if __name__ == "__main__":
             test_image = Image.fromarray(test_image)
             result = inference(test_image)
             if result:
-                # test_image.save('SB/'+str(idx)+'.jpg')
+                # test_image.save('SB/'+str(idx)+'.jpg') #경계이미지 저장
+                # cv2.imwrite(directory_path+str(idx-1)+'.jpg', frame_list[idx-1])
+                # cv2.imwrite(directory_path+str(idx)+'.jpg', frame_list[idx])
                 shot_boundary_list.append((idx-1, idx))
             sys.stdout.write("\033[F") # Cursor up one line
         print("%.2f%%" % 100)
         time.sleep(1)
 
+        print("shot interval list")
         prev = 0
         for pair in shot_boundary_list:
             curr = pair[0]
