@@ -1,10 +1,11 @@
 from findframe import *
 import cv2
 import glob
+import math
 import numpy as np
 import sys
 
-result_dir = '/hdd/stonehye/shot_data/video_data/vcdb_core/'
+result_dir = '/hdd/stonehye/shot_data/video_data/trecvid2018/'
 
 def SBD(videopath='1e5aec100a5b897342a4be9246995fc16f784e66.flv'):
 	# dataload
@@ -15,31 +16,34 @@ def SBD(videopath='1e5aec100a5b897342a4be9246995fc16f784e66.flv'):
 	frame_diffs = []
 	frames = []
 	success, frame = cap.read()
+	frameId = cap.get(1)
+	frameRate = cap.get(5)
 	i = 0
 	FRAME = Frame(0, 0)
 	while (success):
-		luv = cv2.cvtColor(frame, cv2.COLOR_BGR2LUV)
-		curr_frame = luv
 		"""
 		calculate the difference between frames 
 		"""
+		if (frameId % math.floor(frameRate) == 0):
+			luv = cv2.cvtColor(frame, cv2.COLOR_BGR2LUV)
+			curr_frame = luv
+			if curr_frame is not None and prev_frame is not None:
+				diff = cv2.absdiff(curr_frame, prev_frame)
+				diff_sum = np.sum(diff)
+				diff_sum_mean = diff_sum / (diff.shape[0] * diff.shape[1])
+				frame_diffs.append(diff_sum_mean)
+				frame = Frame(i, diff_sum_mean)
+				frames.append(frame)
+			elif curr_frame is not None and prev_frame is None:
+				diff_sum_mean = 0
+				frame_diffs.append(diff_sum_mean)
+				frame = Frame(i, diff_sum_mean)
+				frames.append(frame)
 
-		if curr_frame is not None and prev_frame is not None:
-			diff = cv2.absdiff(curr_frame, prev_frame)
-			diff_sum = np.sum(diff)
-			diff_sum_mean = diff_sum / (diff.shape[0] * diff.shape[1])
-			frame_diffs.append(diff_sum_mean)
-			frame = Frame(i, diff_sum_mean)
-			frames.append(frame)
-		elif curr_frame is not None and prev_frame is None:
-			diff_sum_mean = 0
-			frame_diffs.append(diff_sum_mean)
-			frame = Frame(i, diff_sum_mean)
-			frames.append(frame)
-
-		prev_frame = curr_frame
-		i = i + 1
+			prev_frame = curr_frame
+			i = i + 1
 		success, frame = cap.read()
+		frameId = cap.get(1)
 	cap.release()
 
 	# detect the possible frame
@@ -59,7 +63,7 @@ if __name__ == '__main__':
 	'''
 	Detect shot boundary frame num
 	'''
-	video_list = glob.glob('/hdd/stonehye/shot_data/video_data/vcdb_core/*')
+	video_list = glob.glob('/hdd/stonehye/shot_data/video_data/trecvid2018/*')
 	video_list = [file for file in video_list if (file.endswith('.flv') or file.endswith('.mp4'))]
 
 	c = 0

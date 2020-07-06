@@ -41,11 +41,12 @@ class Frame:
 		detect the possible frame
 
 		"""
+		#parameter
 		possible_frame = []
 		window_frame = []
-		window_size = 30
+		window_size = 2
 		m_suddenJudge = 3
-		m_MinLengthOfShot = 8
+		m_MinLengthOfShot = 1
 		start_id_spot = []
 		start_id_spot.append(0)
 		end_id_spot = []
@@ -124,8 +125,9 @@ class Frame:
 			optimize the possible frame
 
 		'''
+		#parameter
 		new_tag_frames = []
-		frame_count = 10
+		frame_count = 3
 		diff_threshold = 10
 		diff_optimize = 2
 		start_id_spot = []

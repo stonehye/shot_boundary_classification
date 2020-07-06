@@ -2,9 +2,10 @@ import cv2
 import glob
 import numpy as np
 import sys
+import math
 from random import *
 
-result_dir = '/hdd/stonehye/shot_data/temp_negative/'
+result_dir = '/hdd/stonehye/shot_data/tagging_positive/'
 # result_dir = './'
 negative_max = 750
 
@@ -12,19 +13,23 @@ negative_max = 750
 def Frame(videopath, frame_list):
 	cap = cv2.VideoCapture(str(videopath))
 	success, frame = cap.read()
+	frameRate = cap.get(5)
 	filename = videopath.split('/')[-1]
+	frameId = cap.get(1)
 	i = 0
 	while (success):
-		if str(i) in frame_list:
-			cv2.imwrite(result_dir+filename+'_'+str(i)+'.jpg', frame)
-			# print(result_dir+filename+'_'+str(i)+'.jpg')
-		i = i + 1
+		if (frameId % math.floor(frameRate) == 0):
+			if str(i) in frame_list:
+				cv2.imwrite(result_dir+filename+'_'+str(i)+'.jpg', frame)
+				# print(result_dir+filename+'_'+str(i)+'.jpg')
+			i = i + 1
 		success, frame = cap.read()
+		frameId = cap.get(1)
 	cap.release()
 
 
 def positive():
-	video_list = glob.glob('/hdd/stonehye/shot_data/video_data/vcdb_core/*')
+	video_list = glob.glob('/hdd/stonehye/shot_data/video_data/trecvid2018/*')
 	video_list = [file for file in video_list if (file.endswith('.flv') or file.endswith('.mp4'))]
 	# print(video_list)
 
@@ -41,7 +46,8 @@ def positive():
 			Frame(file, frame_list)
 			f.close()
 		except:
-			print(file)
+			#print(file)
+			print('no')
 
 
 def negative():
@@ -81,5 +87,5 @@ def negative():
 
 
 if __name__ == '__main__':
-	negative()
+	positive()
 			

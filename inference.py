@@ -6,13 +6,14 @@ import os
 import cv2
 import sys
 import time
+import math
 import argparse
 from torchvision import datasets, models, transforms
 from torchvision.utils import save_image
 from PIL import Image
 
 # model_path = 'model/00210.pth'
-model_path = '/hdd/stonehye/shot_data/models/20200630013953/00045.pth'
+model_path = '/hdd/stonehye/shot_data/models/20200706012635/00198.pth'
 
 m = models.mobilenet_v2(pretrained=False)
 m.classifier[1] = nn.Linear(m.last_channel, 2)
@@ -52,11 +53,14 @@ def crop_and_concat(frame1, frame2):
 def frame_extract(videopath):
     frame_list = list()
     cap = cv2.VideoCapture(str(videopath))
+    frameRate = cap.get(5)
     success, frame = cap.read()
     i = 0
     while (success):
-        frame_list.append(frame)
-        i = i + 1
+        frameId = cap.get(1)
+        if (frameId % math.floor(frameRate) == 0):
+            frame_list.append(frame)
+            i = i + 1
         success, frame = cap.read()
     cap.release()
     return frame_list
@@ -104,8 +108,8 @@ if __name__ == "__main__":
             result = inference(test_image)
             if result:
                 # test_image.save('SB/'+str(idx)+'.jpg') #경계이미지 저장
-                # cv2.imwrite(directory_path+str(idx-1)+'.jpg', frame_list[idx-1])
-                # cv2.imwrite(directory_path+str(idx)+'.jpg', frame_list[idx])
+                cv2.imwrite(directory_path+str(idx-1)+'.jpg', frame_list[idx-1])
+                cv2.imwrite(directory_path+str(idx)+'.jpg', frame_list[idx])
                 shot_boundary_list.append((idx-1, idx))
             sys.stdout.write("\033[F") # Cursor up one line
         print("%.2f%%" % 100)
