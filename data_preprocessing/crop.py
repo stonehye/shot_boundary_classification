@@ -2,11 +2,24 @@ import os
 import cv2
 import glob
 import numpy as np
+import random
 
+from data_augmentation import add_blackborder
+
+BLACKBORDER = 1
 pair_list = list()
 
 
 def concatenate(frame1, frame2, output_name = './result.jpg'):
+    # if you want to add blackborder (for augmentation)
+    if BLACKBORDER:
+        Top = int(random.choice([2,3,4,5,6])*0.01 * frame1.shape[0])
+        Bottom = Top
+        Left = random.choice([0, Top])
+        Right = Left
+        frame1 = add_blackborder(top=Top, bottom=Bottom, left=Left, right =Right, img=frame1)
+        frame2 = add_blackborder(top=Top, bottom=Bottom, left=Left, right =Right, img=frame2)
+
     height, width = frame1.shape[:2]
     frame1_cropped = frame1[0:height, 0:int(width/2)]
     height, width = frame2.shape[:2]
@@ -16,9 +29,9 @@ def concatenate(frame1, frame2, output_name = './result.jpg'):
 
 
 if __name__ == '__main__':
-    directory = '/hdd/stonehye/shot_data/temp_negative/*'
+    directory = '/hdd/stonehye/shot_data/non_shot_boundary_frames_complete/*'
     # directory = '/hdd/stonehye/shot_data/*'
-    result_directory = '/hdd/stonehye/shot_data/test_again/negative/'
+    result_directory = '/hdd/stonehye/shot_data/train/negative/'
     frame_list = glob.glob(directory)
     frame_list = [file for file in frame_list if (file.endswith('.jpg'))]
     frame_list = sorted(frame_list)
@@ -52,6 +65,6 @@ if __name__ == '__main__':
     
     cnt = 0
     for i in pair_list:
-        concatenate(i[0], i[1], output_name=result_directory+str(cnt)+'.jpg')
+        concatenate(i[0], i[1], output_name=result_directory+str(cnt)+'_border.jpg')
         cnt += 1
 
